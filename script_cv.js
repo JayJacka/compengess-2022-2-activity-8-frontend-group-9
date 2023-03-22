@@ -7,7 +7,7 @@ const authorizeApplication = () => {
 
 // TODO #3.1: Change group number
 const getGroupNumber = () => {
-  return 99;
+  return 9;
 };
 
 // Example: Send Get user profile ("GET") request to backend server and show the response on the webpage
@@ -37,11 +37,20 @@ const getUserProfile = async () => {
 //            and display the result on the webpage
 const getCompEngEssCid = async () => {
   document.getElementById("ces-cid-value").innerHTML = "";
-  console.log(
-    "This function should fetch 'get courses' route from backend server and find cv_cid value of Comp Eng Ess."
-  );
+  // console.log(
+  //   "This function should fetch 'get courses' route from backend server and find cv_cid value of Comp Eng Ess."
+  // );
+  const options = {
+    method: "GET",
+    credentials: "include",
+  };
+  await fetch(`http://${backendIPAddress}/courseville/get_courses`, options)
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+    document.getElementById("ces-cid-value").innerHTML = data.data.student.filter((course) => course.course_no === "2110221")[0].cv_cid
+  }).catch((err)=>console.log(err));
 };
-
 // TODO #3.5: Send Get Course Assignments ("GET") request with cv_cid to backend server
 //            and create Comp Eng Ess assignments table based on the response (itemid, title)
 const createCompEngEssAssignmentTable = async () => {
@@ -49,9 +58,26 @@ const createCompEngEssAssignmentTable = async () => {
   table_body.innerHTML = "";
   const cv_cid = document.getElementById("ces-cid-value").innerHTML;
 
-  console.log(
-    "This function should fetch 'get course assignments' route from backend server and show assignments in the table."
-  );
+  // console.log(
+  //   "This function should fetch 'get course assignments' route from backend server and show assignments in the table."
+  // );
+  const options = {
+    method: "GET",
+    credentials: "include",
+  };
+  await fetch(`http://${backendIPAddress}/courseville/get_course_assignments/${cv_cid}`, options)
+  .then((response) => response.json())
+  .then((data) => {
+    console.log(data);
+    data.data.forEach((assignment) => {
+      table_body.innerHTML += `
+        <tr>
+          <td>${assignment.itemid}</td>
+          <td>${assignment.title}</td>
+        </tr>
+      `
+    })
+  }).catch((err)=>console.log(err));
 };
 
 const logout = async () => {
